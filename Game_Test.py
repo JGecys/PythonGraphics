@@ -5,18 +5,30 @@ wn = turtle.Screen()                 # Get a reference to the window
 wn.title("Flower digger")     # Change the window title
 wn.bgcolor("lightgreen")
 
-#Registering shapes
-turtle.register_shape("Char.gif")
-turtle.register_shape("item_board.gif")
-turtle.register_shape("grass.gif")
-turtle.register_shape("dirt.gif")
-turtle.register_shape("shoveling.gif")
-turtle.register_shape("yellow.gif")
-turtle.register_shape("red.gif")
-turtle.register_shape("tree.gif")
-turtle.register_shape("wood.gif")
+CHAR = "Textures/Char.gif"
+ITEM_BOARD = "Textures/item_board.gif"
+GRASS = "Textures/grass.gif"
+DIRT = "Textures/dirt.gif"
+SHOVELING = "Textures/shoveling.gif"
+YELLOW = "Textures/yellow.gif"
+RED = "Textures/red.gif"
+TREE = "Textures/tree.gif"
+WOOD = "Textures/wood.gif"
 
-grlist = ["grass.gif", "grass.gif", "grass.gif", "grass.gif", "yellow.gif", "red.gif", "tree.gif"]
+#Registering shapes
+turtle.register_shape(CHAR)
+turtle.register_shape(ITEM_BOARD)
+turtle.register_shape(GRASS)
+turtle.register_shape(DIRT)
+turtle.register_shape(SHOVELING)
+turtle.register_shape(YELLOW)
+turtle.register_shape(RED)
+turtle.register_shape(TREE)
+turtle.register_shape(WOOD)
+
+grlist = [GRASS, GRASS, GRASS, GRASS, YELLOW, RED, TREE]
+
+
 
 class loading(threading.Thread):
     grass = []
@@ -43,7 +55,7 @@ class loading(threading.Thread):
         ye.showturtle()
         t=threading.Thread(target=loading.addLoot, args=(ye, shape))
         t.start()
-        if(shape == "tree.gif"):
+        if(shape == TREE):
             ye.passable = False
             ye.hitpoints = 10
         else:
@@ -57,18 +69,18 @@ class loading(threading.Thread):
         return -1
 
     def addLoot(grass, shape):
-        if (shape == "grass.gif"):
+        if (shape == GRASS):
             grass.loot = {'dirt':random.randint(1, 2)}
-        elif (shape == "yellow.gif"):
+        elif (shape == YELLOW):
             grass.loot = {'dirt':random.randint(1, 2), 'yellow_flower':3}
-        elif (shape == "red.gif"):
+        elif (shape == RED):
             grass.loot = {'dirt':random.randint(1, 2), 'red_flower':3}
         else:
             grass.loot = {'wood':random.randint(2, 5)}
     
     def dig(grass):
         loading.getLoot(grass)
-        grass.shape("dirt.gif")
+        grass.shape(DIRT)
         x = grass.pos()[0]
         y = grass.pos()[1]
         t = threading.Timer(120, loading.backToGrass, args = (x, y))
@@ -79,7 +91,7 @@ class loading(threading.Thread):
             tree.hitpoints -= 1
         else:
             loading.getLoot(tree)
-            shape = tree.shape("grass.gif")
+            shape = tree.shape(GRASS)
             loading.addLoot(tree, shape)
             tree.passable = True
         t=threading.Thread(target=loading.playChopSound)
@@ -100,9 +112,7 @@ class loading(threading.Thread):
             loot[item] = 0
 
     def playChopSound():
-        winsound.PlaySound("Sounds/wood" + str(random.randint(1, 5)) + ".wav", winsound.SND_FILENAME)
-
-
+        winsound.PlaySound("Sounds/wood" + str(random.randint(1, 5)) + ".wav", winsound.SND_ASYNC) #winsound.SND_FILENAME
 class char(threading.Thread):
     tess = turtle.Turtle()
     name = ""
@@ -115,7 +125,7 @@ class char(threading.Thread):
         tess = self.tess
         tess.degrees()
         tess.speed(1)
-        tess.shape("Char.gif")
+        tess.shape(CHAR)
         tess.shapesize(10, 10)
         tess.penup()
         while(self.name == ""):
@@ -134,7 +144,7 @@ class char(threading.Thread):
         pos = self.tess.pos()
         obj = loading.getFromCoord(pos[0], pos[1])
         if (obj != -1):
-            self.tess.shape("shoveling.gif")
+            self.tess.shape(SHOVELING)
             loading.dig(obj)
             gui.update()
             t = threading.Timer(0.2, self.toChar)
@@ -142,7 +152,7 @@ class char(threading.Thread):
 
     def toChar(self):
         try:
-            self.tess.shape("Char.gif")
+            self.tess.shape(CHAR)
         except:
             pass
 
@@ -196,9 +206,9 @@ class char(threading.Thread):
         y = round(y, -1)
         tree = loading.getFromCoord(x, y)
         if (tree != -1):
-            if (tree.shape() == "tree.gif"):
+            if (tree.shape() == TREE):
                 if(tree.distance(self.tess.pos()) <= 20):
-                    self.tess.shape("shoveling.gif")
+                    self.tess.shape(SHOVELING)
                     loading.cut(tree)
                     gui.update()
                     t = threading.Timer(0.2, self.toChar)
@@ -213,13 +223,13 @@ class gui():
         self.drawGui()
 
     def addItems(self):
-        dirt = gui_item("dirt.gif", "dirt")
+        dirt = gui_item(DIRT, "dirt")
         self.items.append(dirt)
-        yellow = gui_item("yellow.gif", "yellow_flower")
+        yellow = gui_item(YELLOW, "yellow_flower")
         self.items.append(yellow)
-        red = gui_item("red.gif", "red_flower")
+        red = gui_item(RED, "red_flower")
         self.items.append(red)
-        wood=gui_item("wood.gif", "wood")
+        wood=gui_item(WOOD, "wood")
         self.items.append(wood)
 
     def drawGui(self):
@@ -228,7 +238,7 @@ class gui():
             x=(self.gui_pos[0]) - (len(self.items)*10) + (k * 11)
             y=self.gui_pos[1]
             item.object = self.createTurtle(item.name, x, y)
-            item.boarder = self.createTurtle("item_board.gif", x, y)
+            item.boarder = self.createTurtle(ITEM_BOARD, x, y)
             k += 1
         gui.update(0)
 
